@@ -3,8 +3,9 @@ from random import randint
 from Tkinter import *
 import tkMessageBox
 import win32api
-matrice=[[4,1,7,3,6,9,8,2,5],[6,3,2,1,5,8,9,4,7],[9,5,8,7,2,4,3,1,6],[8,2,5,4,3,7,1,6,9,],[7,9,1,5,8,6,4,3,2],[3,4,6,9,1,2,7,5,8],[2,8,9,6,4,3,5,7,1],[5,7,3,2,9,1,6,8,4],[1,6,4,8,7,5,2,9,3]]
 mateasy=[[4,1,7,3,6,9,8,2,5],[6,3,2,1,5,8,9,4,7],[9,5,8,7,2,4,3,1,6],[8,2,5,4,3,7,1,6,9,],[7,9,1,5,8,6,4,3,2],[3,4,6,9,1,2,7,5,8],[2,8,9,6,4,3,5,7,1],[5,7,3,2,9,1,6,8,4],[1,6,4,8,7,5,2,9,3]]
+matrice_med=[[1,4,5,3,2,7,6,9,8],[8,3,9,6,5,4,1,2,7],[6,7,2,9,1,8,5,4,3],[4,9,6,1,8,5,3,7,2],[2,1,8,4,7,3,9,5,6],[7,5,3,2,9,6,4,8,1],[3,6,7,5,4,2,8,1,9],[9,8,4,7,6,1,2,3,5],[5,2,1,8,3,9,7,6,4]]
+matrice_hard=[[1,7,3,9,8,2,6,5,4],[6,5,2,1,7,4,8,9,3],[9,8,4,5,3,6,1,2,7],[7,2,9,4,1,5,3,6,8],[8,4,1,3,6,9,2,7,5],[5,3,6,8,2,7,4,1,9],[2,6,5,7,4,3,9,8,1],[4,1,7,2,9,8,5,3,6],[3,9,8,6,5,1,7,4,2]]
 casute=[]
 class fr(wx.Frame):
 	def __init__(self,parent,id):
@@ -106,8 +107,8 @@ class MyCustomFrame(wx.Frame):
 				a=a+1
 			list_verif.append(aux)
 		print(list_verif,"\n")
-		print(matrice)
-		if list_verif!=matrice:
+		#print(matrice)
+		if list_verif!=mateasy:
 			win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
 		else:
 			win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu !','Fin du jeu')
@@ -121,21 +122,22 @@ class MyCustomFrame2(wx.Frame):
 		self.Bind(wx.EVT_BUTTON,self.Verify, button_verificare)
 		self.Bind(wx.EVT_PAINT,self.OnPaint)
 		font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-		for k in range(55):
+		mat_med=matrice_med
+		for k in range(52):
 			x=randint(0,8)
 			y=randint(0,8)
-			if mateasy[x][y]!=' ':
-				mateasy[x][y]=' '
+			if mat_med[x][y]!=' ':
+				mat_med[x][y]=' '
 			else: 
 				k=k-1
 		for i in range(9):
 			for j in range(9):
-				if (mateasy[i][j]!=' '):
+				if (mat_med[i][j]!=' '):
 					b=self.edit = wx.TextCtrl(self, style=wx.TE_CENTER|wx.TE_READONLY, pos=(52*i, 52*j),size=(48,48))
 				else:
 					b=self.edit = wx.TextCtrl(self, style=wx.TE_CENTER, pos=(52*i, 52*j),size=(48,48))
 					b.SetForegroundColour(wx.BLUE)
-				b.SetValue(str(mateasy[i][j]).strip())
+				b.SetValue(str(mat_med[i][j]).strip())
 				b.SetFont(font1)
 				casute.append(b)
 				b.Bind(wx.EVT_TEXT_ENTER, self.onAction)
@@ -165,8 +167,8 @@ class MyCustomFrame2(wx.Frame):
 				a=a+1
 			list_verif.append(aux)
 		print(list_verif,"\n")
-		print(matrice)
-		if list_verif!=matrice:
+		#print(matrice)
+		if list_verif!=matrice_med:
 			win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
 		else:
 			win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu !','Fin du jeu')
@@ -180,21 +182,22 @@ class MyCustomFrame3(wx.Frame):
 		self.Bind(wx.EVT_BUTTON,self.Verify, button_verificare)
 		self.Bind(wx.EVT_PAINT,self.OnPaint)
 		font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-		for k in range(60):
+		mat_hard=matrice_hard
+		for k in range(1):
 			x=randint(0,8)
 			y=randint(0,8)
-			if mateasy[x][y]!=' ':
-				mateasy[x][y]=' '
+			if mat_hard[x][y]!=' ':
+				mat_hard[x][y]=' '
 			else: 
 				k=k-1
 		for i in range(9):
 			for j in range(9):
-				if (mateasy[i][j]!=' '):
+				if (mat_hard[i][j]!=' '):
 					b=self.edit = wx.TextCtrl(self, style=wx.TE_CENTER|wx.TE_READONLY, pos=(52*i, 52*j),size=(48,48))
 				else:
 					b=self.edit = wx.TextCtrl(self, style=wx.TE_CENTER, pos=(52*i, 52*j),size=(48,48))
 					b.SetForegroundColour(wx.BLUE)
-				b.SetValue(str(mateasy[i][j]).strip())
+				b.SetValue(str(mat_hard[i][j]).strip())
 				b.SetFont(font1)
 				casute.append(b)
 				b.Bind(wx.EVT_TEXT_ENTER, self.onAction)
@@ -224,8 +227,8 @@ class MyCustomFrame3(wx.Frame):
 				a=a+1
 			list_verif.append(aux)
 		print(list_verif,"\n")
-		print(matrice)
-		if list_verif!=matrice:
+		#print(matrice)
+		if list_verif!=matrice_hard:
 			win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
 		else:
 			win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu !','Fin du jeu')
