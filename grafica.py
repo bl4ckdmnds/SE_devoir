@@ -307,7 +307,7 @@ class MyCustomFrame3(wx.Frame,threading.Thread):
 						win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
 				except Exception as err:
 					win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
-					logging.error("Completez seulement avec des chiffres entre 1 et 9",err)
+					logging.info("Completez seulement avec des chiffres entre 1 et 9")
 def main(argv=None):
 	logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',filename='Sudoku.log', level=logging.INFO)
 	logging.info('Started')
@@ -315,7 +315,7 @@ def main(argv=None):
 					
 if __name__ == '__main__':
 	app=wx.PySimpleApp()
+	main()
 	frame=fr(parent=None,id=-1)
 	frame.Show()
 	app.MainLoop()
-	main()
