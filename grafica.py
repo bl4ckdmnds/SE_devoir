@@ -1,4 +1,5 @@
 import wx
+import time
 from random import randint
 from Tkinter import *
 import tkMessageBox
@@ -6,10 +7,14 @@ import win32api
 mateasy=[[4,1,7,3,6,9,8,2,5],[6,3,2,1,5,8,9,4,7],[9,5,8,7,2,4,3,1,6],[8,2,5,4,3,7,1,6,9,],[7,9,1,5,8,6,4,3,2],[3,4,6,9,1,2,7,5,8],[2,8,9,6,4,3,5,7,1],[5,7,3,2,9,1,6,8,4],[1,6,4,8,7,5,2,9,3]]
 matrice_med=[[1,4,5,3,2,7,6,9,8],[8,3,9,6,5,4,1,2,7],[6,7,2,9,1,8,5,4,3],[4,9,6,1,8,5,3,7,2],[2,1,8,4,7,3,9,5,6],[7,5,3,2,9,6,4,8,1],[3,6,7,5,4,2,8,1,9],[9,8,4,7,6,1,2,3,5],[5,2,1,8,3,9,7,6,4]]
 matrice_hard=[[1,7,3,9,8,2,6,5,4],[6,5,2,1,7,4,8,9,3],[9,8,4,5,3,6,1,2,7],[7,2,9,4,1,5,3,6,8],[8,4,1,3,6,9,2,7,5],[5,3,6,8,2,7,4,1,9],[2,6,5,7,4,3,9,8,1],[4,1,7,2,9,8,5,3,6],[3,9,8,6,5,1,7,4,2]]
+mat_med=[[1,4,5,3,2,7,6,9,8],[8,3,9,6,5,4,1,2,7],[6,7,2,9,1,8,5,4,3],[4,9,6,1,8,5,3,7,2],[2,1,8,4,7,3,9,5,6],[7,5,3,2,9,6,4,8,1],[3,6,7,5,4,2,8,1,9],[9,8,4,7,6,1,2,3,5],[5,2,1,8,3,9,7,6,4]]
+mat_hard=[[1,7,3,9,8,2,6,5,4],[6,5,2,1,7,4,8,9,3],[9,8,4,5,3,6,1,2,7],[7,2,9,4,1,5,3,6,8],[8,4,1,3,6,9,2,7,5],[5,3,6,8,2,7,4,1,9],[2,6,5,7,4,3,9,8,1],[4,1,7,2,9,8,5,3,6],[3,9,8,6,5,1,7,4,2]]
 casute=[]
+start_time = time.time()
+timp = time.time()
 class fr(wx.Frame):
 	def __init__(self,parent,id):
-		wx.Frame.__init__(self,parent,id,'SUDOKU',size=(400,400))
+		wx.Frame.__init__(self,parent,id,'SUDOKU',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(390,390))
 		panel=wx.Panel(self)
 		font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
 		button_easy=wx.Button(panel, label="Easy", pos=(140,100), size=(90,40))
@@ -41,21 +46,24 @@ class fr(wx.Frame):
 		helpwindow.Show()
 	def sudoku1(self,event):
 		game=MyCustomFrame(parent=None,id=-1)
+		start_time = time.time()
 		game.Show()
 	def sudoku2(self,event):
 		game=MyCustomFrame2(parent=None,id=-1)
 		game.Show()
+		start_time = time.time()
 	def sudoku3(self,event):
 		game=MyCustomFrame3(parent=None,id=-1)
 		game.Show()
+		start_time = time.time()
 class fr2(wx.Frame):
 	def __init__(self,parent,id):
-		wx.Frame.__init__(self,parent,id,'How To Play Sudoku',pos=(500,200),size=(400,400))
+		wx.Frame.__init__(self,parent,id,'How To Play Sudoku',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,pos=(500,200),size=(390,390))
 		panel=wx.Panel(self)
 		text=wx.StaticText(panel,-1,"Rules of playing sudoku", (150,30))
 class MyCustomFrame(wx.Frame):
 	def __init__(self,parent,id):
-		wx.Frame.__init__(self,parent,id,'SUDOKU - Easy Mode',size=(481,553))
+		wx.Frame.__init__(self,parent,id,'SUDOKU - Easy Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
 		panel=wx.Panel(self)
 		font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
 		button_verificare=wx.Button(self, label="Verify", pos=(156,466), size=(152,46))	
@@ -111,10 +119,11 @@ class MyCustomFrame(wx.Frame):
 		if list_verif!=mateasy:
 			win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
 		else:
-			win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu !','Fin du jeu')
+			timp = time.time() - start_time
+			win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu en '+str(timp)+' !','Fin du jeu')
 class MyCustomFrame2(wx.Frame):
 	def __init__(self,parent,id):
-		wx.Frame.__init__(self,parent,id,'SUDOKU - Medium Mode',size=(481,553))
+		wx.Frame.__init__(self,parent,id,'SUDOKU - Medium Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
 		panel=wx.Panel(self)
 		font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
 		button_verificare=wx.Button(self, label="Verify", pos=(156,466), size=(152,46))	
@@ -122,8 +131,7 @@ class MyCustomFrame2(wx.Frame):
 		self.Bind(wx.EVT_BUTTON,self.Verify, button_verificare)
 		self.Bind(wx.EVT_PAINT,self.OnPaint)
 		font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-		mat_med=matrice_med
-		for k in range(52):
+		for k in range(53):
 			x=randint(0,8)
 			y=randint(0,8)
 			if mat_med[x][y]!=' ':
@@ -167,14 +175,14 @@ class MyCustomFrame2(wx.Frame):
 				a=a+1
 			list_verif.append(aux)
 		print(list_verif,"\n")
-		#print(matrice)
 		if list_verif!=matrice_med:
 			win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
 		else:
-			win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu !','Fin du jeu')
+			timp = time.time() - start_time
+			win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu en '+str(timp)+' !','Fin du jeu')
 class MyCustomFrame3(wx.Frame):
 	def __init__(self,parent,id):
-		wx.Frame.__init__(self,parent,id,'SUDOKU - Hard Mode',size=(481,553))
+		wx.Frame.__init__(self,parent,id,'SUDOKU - Hard Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
 		panel=wx.Panel(self)
 		font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
 		button_verificare=wx.Button(self, label="Verify", pos=(156,466), size=(152,46))	
@@ -182,8 +190,7 @@ class MyCustomFrame3(wx.Frame):
 		self.Bind(wx.EVT_BUTTON,self.Verify, button_verificare)
 		self.Bind(wx.EVT_PAINT,self.OnPaint)
 		font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-		mat_hard=matrice_hard
-		for k in range(1):
+		for k in range(60):
 			x=randint(0,8)
 			y=randint(0,8)
 			if mat_hard[x][y]!=' ':
@@ -231,7 +238,8 @@ class MyCustomFrame3(wx.Frame):
 		if list_verif!=matrice_hard:
 			win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
 		else:
-			win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu !','Fin du jeu')
+			timp = time.time() - start_time
+			win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu en '+str(timp)+' !','Fin du jeu')
 # class   MyCustomPanel(wx.Panel):
 		# def __init__(self,parent,id):
 			# wx.Panel.__init__(self,parent,id)
