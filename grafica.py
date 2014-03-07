@@ -106,7 +106,7 @@ class MyCustomFrame(wx.Frame,threading.Thread):
 				self.Destroy()
 				mutex.release()
 			def run(self):
-				#logging.info("From %s(thread_name)\n" % {"thread_name":self.getName()})
+				logging.info("From %s(thread_name)\n" % {"thread_name":self.getName()})
 				Thread1 = MyCustomFrame(parent=None,id=-1)
 				print "Starting " + self.name
 				Thread1 = Thread(target = MyCustomFrame.__init__)
@@ -193,7 +193,7 @@ class MyCustomFrame2(wx.Frame,threading.Thread):
 				dc.DrawLine(0,310,462,310)
 				self.dc.EndDrawing()
 			def run(self):
-				#logging.info("From %s(thread_name)\n" % {"thread_name":self.getName()})
+				logging.info("From %s(thread_name)\n" % {"thread_name":self.getName()})
 				Thread2 = MyCustomFrame2(parent=None,id=-1)
 				print "Starting " + self.name
 				Thread2 = Thread(target = self.__init__)
@@ -272,7 +272,7 @@ class MyCustomFrame3(wx.Frame,threading.Thread):
 				dc.DrawLine(0,310,462,310)
 				self.dc.EndDrawing()
 			def run(self):
-				#logging.info("From %s(thread_name)\n" % {"thread_name":self.getName()})
+				logging.info("From %s(thread_name)\n" % {"thread_name":self.getName()})
 				Thread3 = MyCustomFrame3(parent=None,id=-1)
 				print "Starting " + self.name
 				Thread3 = Thread(target = self.__init__)
@@ -305,10 +305,17 @@ class MyCustomFrame3(wx.Frame,threading.Thread):
 						timp = time.time() - start_time
 						score=5000-int(timp)
 						win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
-				except:
+				except Exception as err:
 					win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
+					logging.error("Completez seulement avec des chiffres entre 1 et 9",err)
+def main(argv=None):
+	logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',filename='Sudoku.log', level=logging.INFO)
+	logging.info('Started')
+	logging.info('Finished')
+					
 if __name__ == '__main__':
 	app=wx.PySimpleApp()
 	frame=fr(parent=None,id=-1)
 	frame.Show()
 	app.MainLoop()
+	main()
