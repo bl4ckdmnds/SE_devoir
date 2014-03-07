@@ -1,14 +1,15 @@
 import wx
 import time
 from random import randint
-from Tkinter import *
-import tkMessageBox
+
 import win32api
-mateasy=[[4,1,7,3,6,9,8,2,5],[6,3,2,1,5,8,9,4,7],[9,5,8,7,2,4,3,1,6],[8,2,5,4,3,7,1,6,9,],[7,9,1,5,8,6,4,3,2],[3,4,6,9,1,2,7,5,8],[2,8,9,6,4,3,5,7,1],[5,7,3,2,9,1,6,8,4],[1,6,4,8,7,5,2,9,3]]
+import copy
+matrice_easy=[[4,1,7,3,6,9,8,2,5],[6,3,2,1,5,8,9,4,7],[9,5,8,7,2,4,3,1,6],[8,2,5,4,3,7,1,6,9,],[7,9,1,5,8,6,4,3,2],[3,4,6,9,1,2,7,5,8],[2,8,9,6,4,3,5,7,1],[5,7,3,2,9,1,6,8,4],[1,6,4,8,7,5,2,9,3]]
 matrice_med=[[1,4,5,3,2,7,6,9,8],[8,3,9,6,5,4,1,2,7],[6,7,2,9,1,8,5,4,3],[4,9,6,1,8,5,3,7,2],[2,1,8,4,7,3,9,5,6],[7,5,3,2,9,6,4,8,1],[3,6,7,5,4,2,8,1,9],[9,8,4,7,6,1,2,3,5],[5,2,1,8,3,9,7,6,4]]
 matrice_hard=[[1,7,3,9,8,2,6,5,4],[6,5,2,1,7,4,8,9,3],[9,8,4,5,3,6,1,2,7],[7,2,9,4,1,5,3,6,8],[8,4,1,3,6,9,2,7,5],[5,3,6,8,2,7,4,1,9],[2,6,5,7,4,3,9,8,1],[4,1,7,2,9,8,5,3,6],[3,9,8,6,5,1,7,4,2]]
-mat_med=[[1,4,5,3,2,7,6,9,8],[8,3,9,6,5,4,1,2,7],[6,7,2,9,1,8,5,4,3],[4,9,6,1,8,5,3,7,2],[2,1,8,4,7,3,9,5,6],[7,5,3,2,9,6,4,8,1],[3,6,7,5,4,2,8,1,9],[9,8,4,7,6,1,2,3,5],[5,2,1,8,3,9,7,6,4]]
-mat_hard=[[1,7,3,9,8,2,6,5,4],[6,5,2,1,7,4,8,9,3],[9,8,4,5,3,6,1,2,7],[7,2,9,4,1,5,3,6,8],[8,4,1,3,6,9,2,7,5],[5,3,6,8,2,7,4,1,9],[2,6,5,7,4,3,9,8,1],[4,1,7,2,9,8,5,3,6],[3,9,8,6,5,1,7,4,2]]
+mateasy=[]
+matmed=[]
+mathard=[]
 casute=[]
 start_time = time.time()
 timp = time.time()
@@ -63,6 +64,7 @@ class fr2(wx.Frame):
 		text=wx.StaticText(panel,-1,"Rules of playing sudoku", (150,30))
 class MyCustomFrame(wx.Frame):
 	def __init__(self,parent,id):
+		mateasy=copy.deepcopy(matrice_easy)
 		wx.Frame.__init__(self,parent,id,'SUDOKU - Easy Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
 		panel=wx.Panel(self)
 		font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
@@ -71,7 +73,7 @@ class MyCustomFrame(wx.Frame):
 		self.Bind(wx.EVT_BUTTON,self.Verify, button_verificare)
 		self.Bind(wx.EVT_PAINT,self.OnPaint)
 		font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-		for k in range(45):
+		for k in range(2):
 			x=randint(0,8)
 			y=randint(0,8)
 			if mateasy[x][y]!=' ':
@@ -89,6 +91,7 @@ class MyCustomFrame(wx.Frame):
 				b.SetFont(font1)
 				casute.append(b)
 				b.Bind(wx.EVT_TEXT_ENTER, self.onAction)
+		
 	def OnPaint(self,evt):
 		self.dc = dc = wx.PaintDC(self)
 		dc.BeginDrawing()
@@ -106,23 +109,30 @@ class MyCustomFrame(wx.Frame):
 		else:
 			self.edit.ChangeValue("Number only")
 	def Verify(self, event):
-		a=0
-		list_verif=[]
-		for nr1 in range (9):
-			aux=[]
-			for nr2 in range (9):
-				aux.append(int(casute[a].GetValue().strip()))
-				a=a+1
-			list_verif.append(aux)
-		print(list_verif,"\n")
-		#print(matrice)
-		if list_verif!=mateasy:
-			win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
-		else:
-			timp = time.time() - start_time
-			win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu en '+str(timp)+' !','Fin du jeu')
+		try:
+			a=0
+			list_verif=[]
+			for nr1 in range (9):
+				aux=[]
+				for nr2 in range (9):
+					aux.append(int(casute[a].GetValue().strip()))
+					a=a+1
+				list_verif.append(aux)
+			print(list_verif,"\n")
+			print(matrice_easy)
+			if list_verif!=matrice_easy:
+				win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
+			else:
+				timp = time.time() - start_time
+				score=3000-int(timp)
+				win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
+		except:
+			win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
+				
+		
 class MyCustomFrame2(wx.Frame):
 	def __init__(self,parent,id):
+		mat_med=copy.deepcopy(matrice_med)
 		wx.Frame.__init__(self,parent,id,'SUDOKU - Medium Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
 		panel=wx.Panel(self)
 		font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
@@ -131,7 +141,7 @@ class MyCustomFrame2(wx.Frame):
 		self.Bind(wx.EVT_BUTTON,self.Verify, button_verificare)
 		self.Bind(wx.EVT_PAINT,self.OnPaint)
 		font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-		for k in range(53):
+		for k in range(2):
 			x=randint(0,8)
 			y=randint(0,8)
 			if mat_med[x][y]!=' ':
@@ -166,22 +176,27 @@ class MyCustomFrame2(wx.Frame):
 		else:
 			self.edit.ChangeValue("Number only")
 	def Verify(self, event):
-		a=0
-		list_verif=[]
-		for nr1 in range (9):
-			aux=[]
-			for nr2 in range (9):
-				aux.append(int(casute[a].GetValue().strip()))
-				a=a+1
-			list_verif.append(aux)
-		print(list_verif,"\n")
-		if list_verif!=matrice_med:
-			win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
-		else:
-			timp = time.time() - start_time
-			win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu en '+str(timp)+' !','Fin du jeu')
+		try:
+			a=0
+			list_verif=[]
+			for nr1 in range (9):
+				aux=[]
+				for nr2 in range (9):
+					aux.append(int(casute[a].GetValue().strip()))
+					a=a+1
+				list_verif.append(aux)
+			print(list_verif,"\n")
+			if list_verif!=matrice_med:
+				win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
+			else:
+				timp = time.time() - start_time
+				score=4000-int(timp)
+				win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
+		except:
+			win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
 class MyCustomFrame3(wx.Frame):
 	def __init__(self,parent,id):
+		mat_hard=copy.deepcopy(matrice_hard)
 		wx.Frame.__init__(self,parent,id,'SUDOKU - Hard Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
 		panel=wx.Panel(self)
 		font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
@@ -190,7 +205,7 @@ class MyCustomFrame3(wx.Frame):
 		self.Bind(wx.EVT_BUTTON,self.Verify, button_verificare)
 		self.Bind(wx.EVT_PAINT,self.OnPaint)
 		font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-		for k in range(60):
+		for k in range(2):
 			x=randint(0,8)
 			y=randint(0,8)
 			if mat_hard[x][y]!=' ':
@@ -225,39 +240,26 @@ class MyCustomFrame3(wx.Frame):
 		else:
 			self.edit.ChangeValue("Number only")
 	def Verify(self, event):
-		a=0
-		list_verif=[]
-		for nr1 in range (9):
-			aux=[]
-			for nr2 in range (9):
-				aux.append(int(casute[a].GetValue().strip()))
-				a=a+1
-			list_verif.append(aux)
-		print(list_verif,"\n")
-		#print(matrice)
-		if list_verif!=matrice_hard:
-			win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
-		else:
-			timp = time.time() - start_time
-			win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu en '+str(timp)+' !','Fin du jeu')
-# class   MyCustomPanel(wx.Panel):
-		# def __init__(self,parent,id):
-			# wx.Panel.__init__(self,parent,id)
-			# self.sz =   wx.GridSizer(5,5,0,0)
-			# for i   in  range(25):
-				# self.sz.Add(wx.StaticText(self,-1,str(i)))
-			# self.SetSizer(self.sz)
-			# self.Bind(wx.EVT_PAINT,self.OnPaint)
-		# def OnPaint(self,evt):
-			# self.dc =   dc  =   wx.PaintDC(self)
-			# w,h = self.sz.GetSize()
-			# nr = self.sz.GetRows()
-			# nc = self.sz.GetCols()
-			# cell_w = float(w)/nc
-			# cell_h = float(h)/nr
-			# hlines = [(0,i*cell_h,w,i*cell_h)for i in range(nr+1)]
-			# vlines = [(i*cell_w,0,i*cell_w,h)for i in range(nc+1)]
-			# self.dc.DrawLineList(hlines+vlines)
+		try:
+			a=0
+			list_verif=[]
+			for nr1 in range (9):
+				aux=[]
+				for nr2 in range (9):
+					aux.append(int(casute[a].GetValue().strip()))
+					a=a+1
+				list_verif.append(aux)
+			print(list_verif,"\n")
+			#print(matrice)
+			if list_verif!=matrice_hard:
+				win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
+			else:
+				timp = time.time() - start_time
+				score=5000-int(timp)
+				win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
+		except:
+			win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
+
 if __name__ == '__main__':
 	app=wx.PySimpleApp()
 	frame=fr(parent=None,id=-1)
