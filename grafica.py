@@ -1,7 +1,10 @@
 import wx
 import time
 from random import randint
-
+from Tkinter import *
+import tkMessageBox
+import threading,sys,logging
+from threading import Lock
 import win32api
 import copy
 matrice_easy=[[4,1,7,3,6,9,8,2,5],[6,3,2,1,5,8,9,4,7],[9,5,8,7,2,4,3,1,6],[8,2,5,4,3,7,1,6,9,],[7,9,1,5,8,6,4,3,2],[3,4,6,9,1,2,7,5,8],[2,8,9,6,4,3,5,7,1],[5,7,3,2,9,1,6,8,4],[1,6,4,8,7,5,2,9,3]]
@@ -11,6 +14,8 @@ mateasy=[]
 matmed=[]
 mathard=[]
 casute=[]
+mutex = Lock()
+#mutex.release()
 start_time = time.time()
 timp = time.time()
 class fr(wx.Frame):
@@ -62,204 +67,246 @@ class fr2(wx.Frame):
 		wx.Frame.__init__(self,parent,id,'How To Play Sudoku',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,pos=(500,200),size=(390,390))
 		panel=wx.Panel(self)
 		text=wx.StaticText(panel,-1,"Rules of playing sudoku", (150,30))
-class MyCustomFrame(wx.Frame):
-	def __init__(self,parent,id):
-		mateasy=copy.deepcopy(matrice_easy)
-		wx.Frame.__init__(self,parent,id,'SUDOKU - Easy Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
-		panel=wx.Panel(self)
-		font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-		button_verificare=wx.Button(self, label="Verify", pos=(156,466), size=(152,46))	
-		button_verificare.SetFont(font2)
-		self.Bind(wx.EVT_BUTTON,self.Verify, button_verificare)
-		self.Bind(wx.EVT_PAINT,self.OnPaint)
-		font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-		for k in range(2):
-			x=randint(0,8)
-			y=randint(0,8)
-			if mateasy[x][y]!=' ':
-				mateasy[x][y]=' '
-			else: 
-				k=k-1
-		for i in range(9):
-			for j in range(9):
-				if (mateasy[i][j]!=' '):
-					b=self.edit = wx.TextCtrl(self, style=wx.TE_CENTER|wx.TE_READONLY, pos=(52*i, 52*j),size=(48,48))
+class MyCustomFrame(wx.Frame,threading.Thread):
+		# if mutex.locked():
+			# print("ERROR!!")
+		# else:		
+			def __init__(self,parent,id):
+				mateasy=copy.deepcopy(matrice_easy)
+				mutex.acquire()
+				threading.Thread.__init__(self)
+				wx.Frame.__init__(self,parent,id,'SUDOKU - Easy Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
+				panel=wx.Panel(self)
+				font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+				button_verificare=wx.Button(self, label="Verify", pos=(156,466), size=(152,46))	
+				button_verificare.SetFont(font2)
+				self.Bind(wx.EVT_BUTTON,self.Verify, button_verificare)
+				self.Bind(wx.EVT_PAINT,self.OnPaint)
+				self.Bind(wx.EVT_CLOSE,self.closewindow)
+				font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+				for k in range(45):
+					x=randint(0,8)
+					y=randint(0,8)
+					if mateasy[x][y]!=' ':
+						mateasy[x][y]=' '
+					else: 
+						k=k-1
+				for i in range(9):
+					for j in range(9):
+						if (mateasy[i][j]!=' '):
+							b=self.edit = wx.TextCtrl(self, style=wx.TE_CENTER|wx.TE_READONLY, pos=(52*i, 52*j),size=(48,48))
+						else:
+							b=self.edit = wx.TextCtrl(self, style=wx.TE_CENTER, pos=(52*i, 52*j),size=(48,48))
+							b.SetForegroundColour(wx.BLUE)
+						b.SetValue(str(mateasy[i][j]).strip())
+						b.SetFont(font1)
+						casute.append(b)
+						b.Bind(wx.EVT_TEXT_ENTER, self.onAction)
+			def closewindow(self,event):
+				self.Destroy()
+				mutex.release()
+			def run(self):
+				#logging.info("From %s(thread_name)\n" % {"thread_name":self.getName()})
+				Thread1 = MyCustomFrame(parent=None,id=-1)
+				print "Starting " + self.name
+				Thread1 = Thread(target = MyCustomFrame.__init__)
+				Thread1.start()
+			def OnPaint(self,evt):
+				self.dc = dc = wx.PaintDC(self)
+				dc.BeginDrawing()
+				dc.SetPen(wx.Pen("BLACK", 4))
+				dc.DrawLine(154,0,154,462)
+				dc.DrawLine(310,0,310,462)
+				dc.DrawLine(0,154,462,154)
+				dc.DrawLine(0,310,462,310)
+				self.dc.EndDrawing()
+			def onAction(self, event):
+				raw_value = self.edit.GetValue().strip()
+				if all(x in '0123456789.+-' for x in raw_value):
+					self.value = round(float(raw_value), 2)
+					self.edit.ChangeValue(str(self.value))
 				else:
-					b=self.edit = wx.TextCtrl(self, style=wx.TE_CENTER, pos=(52*i, 52*j),size=(48,48))
-					b.SetForegroundColour(wx.BLUE)
-				b.SetValue(str(mateasy[i][j]).strip())
-				b.SetFont(font1)
-				casute.append(b)
-				b.Bind(wx.EVT_TEXT_ENTER, self.onAction)
-		
-	def OnPaint(self,evt):
-		self.dc = dc = wx.PaintDC(self)
-		dc.BeginDrawing()
-		dc.SetPen(wx.Pen("BLACK", 4))
-		dc.DrawLine(154,0,154,462)
-		dc.DrawLine(310,0,310,462)
-		dc.DrawLine(0,154,462,154)
-		dc.DrawLine(0,310,462,310)
-		self.dc.EndDrawing()
-	def onAction(self, event):
-		raw_value = self.edit.GetValue().strip()
-		if all(x in '0123456789.+-' for x in raw_value):
-			self.value = round(float(raw_value), 2)
-			self.edit.ChangeValue(str(self.value))
-		else:
-			self.edit.ChangeValue("Number only")
-	def Verify(self, event):
-		try:
-			a=0
-			list_verif=[]
-			for nr1 in range (9):
-				aux=[]
-				for nr2 in range (9):
-					aux.append(int(casute[a].GetValue().strip()))
-					a=a+1
-				list_verif.append(aux)
-			print(list_verif,"\n")
-			print(matrice_easy)
-			if list_verif!=matrice_easy:
-				win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
-			else:
-				timp = time.time() - start_time
-				score=3000-int(timp)
-				win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
-		except:
-			win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
-				
-		
-class MyCustomFrame2(wx.Frame):
-	def __init__(self,parent,id):
-		mat_med=copy.deepcopy(matrice_med)
-		wx.Frame.__init__(self,parent,id,'SUDOKU - Medium Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
-		panel=wx.Panel(self)
-		font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-		button_verificare=wx.Button(self, label="Verify", pos=(156,466), size=(152,46))	
-		button_verificare.SetFont(font2)
-		self.Bind(wx.EVT_BUTTON,self.Verify, button_verificare)
-		self.Bind(wx.EVT_PAINT,self.OnPaint)
-		font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-		for k in range(2):
-			x=randint(0,8)
-			y=randint(0,8)
-			if mat_med[x][y]!=' ':
-				mat_med[x][y]=' '
-			else: 
-				k=k-1
-		for i in range(9):
-			for j in range(9):
-				if (mat_med[i][j]!=' '):
-					b=self.edit = wx.TextCtrl(self, style=wx.TE_CENTER|wx.TE_READONLY, pos=(52*i, 52*j),size=(48,48))
+					self.edit.ChangeValue("Number only")
+			def Verify(self, event):
+				try:
+					a=0
+					list_verif=[]
+					for nr1 in range (9):
+						aux=[]
+						for nr2 in range (9):
+							aux.append(int(casute[a].GetValue().strip()))
+							a=a+1
+						list_verif.append(aux)
+					print(list_verif,"\n")
+					print(matrice_easy)
+					if list_verif!=matrice_easy:
+						win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
+					else:
+						timp = time.time() - start_time
+						score=3000-int(timp)
+						win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
+				except:
+					win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
+			#mutex.release()
+class MyCustomFrame2(wx.Frame,threading.Thread):
+		# if mutex.locked():
+			# print("ERROR!!")
+		# else:	
+			def __init__(self,parent,id):
+				mutex.acquire()
+				mat_med=copy.deepcopy(matrice_med)
+				threading.Thread.__init__(self)
+				wx.Frame.__init__(self,parent,id,'SUDOKU - Medium Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
+				panel=wx.Panel(self)
+				font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+				button_verificare=wx.Button(self, label="Verify", pos=(156,466), size=(152,46))	
+				button_verificare.SetFont(font2)
+				self.Bind(wx.EVT_BUTTON,self.Verify, button_verificare)
+				self.Bind(wx.EVT_PAINT,self.OnPaint)
+				self.Bind(wx.EVT_CLOSE,self.closewindow)
+				font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+				for k in range(53):
+					x=randint(0,8)
+					y=randint(0,8)
+					if mat_med[x][y]!=' ':
+						mat_med[x][y]=' '
+					else: 
+						k=k-1
+				for i in range(9):
+					for j in range(9):
+						if (mat_med[i][j]!=' '):
+							b=self.edit = wx.TextCtrl(self, style=wx.TE_CENTER|wx.TE_READONLY, pos=(52*i, 52*j),size=(48,48))
+						else:
+							b=self.edit = wx.TextCtrl(self, style=wx.TE_CENTER, pos=(52*i, 52*j),size=(48,48))
+							b.SetForegroundColour(wx.BLUE)
+						b.SetValue(str(mat_med[i][j]).strip())
+						b.SetFont(font1)
+						casute.append(b)
+						b.Bind(wx.EVT_TEXT_ENTER, self.onAction)
+			def OnPaint(self,evt):
+				self.dc = dc = wx.PaintDC(self)
+				dc.BeginDrawing()
+				dc.SetPen(wx.Pen("BLACK", 4))
+				dc.DrawLine(154,0,154,462)
+				dc.DrawLine(310,0,310,462)
+				dc.DrawLine(0,154,462,154)
+				dc.DrawLine(0,310,462,310)
+				self.dc.EndDrawing()
+			def run(self):
+				#logging.info("From %s(thread_name)\n" % {"thread_name":self.getName()})
+				Thread2 = MyCustomFrame2(parent=None,id=-1)
+				print "Starting " + self.name
+				Thread2 = Thread(target = self.__init__)
+				Thread2.start()
+			def closewindow(self,event):
+				mutex.release()
+				self.Destroy()
+			def onAction(self, event):
+				raw_value = self.edit.GetValue().strip()
+				if all(x in '0123456789.+-' for x in raw_value):
+					self.value = round(float(raw_value), 2)
+					self.edit.ChangeValue(str(self.value))
 				else:
-					b=self.edit = wx.TextCtrl(self, style=wx.TE_CENTER, pos=(52*i, 52*j),size=(48,48))
-					b.SetForegroundColour(wx.BLUE)
-				b.SetValue(str(mat_med[i][j]).strip())
-				b.SetFont(font1)
-				casute.append(b)
-				b.Bind(wx.EVT_TEXT_ENTER, self.onAction)
-	def OnPaint(self,evt):
-		self.dc = dc = wx.PaintDC(self)
-		dc.BeginDrawing()
-		dc.SetPen(wx.Pen("BLACK", 4))
-		dc.DrawLine(154,0,154,462)
-		dc.DrawLine(310,0,310,462)
-		dc.DrawLine(0,154,462,154)
-		dc.DrawLine(0,310,462,310)
-		self.dc.EndDrawing()
-	def onAction(self, event):
-		raw_value = self.edit.GetValue().strip()
-		if all(x in '0123456789.+-' for x in raw_value):
-			self.value = round(float(raw_value), 2)
-			self.edit.ChangeValue(str(self.value))
-		else:
-			self.edit.ChangeValue("Number only")
-	def Verify(self, event):
-		try:
-			a=0
-			list_verif=[]
-			for nr1 in range (9):
-				aux=[]
-				for nr2 in range (9):
-					aux.append(int(casute[a].GetValue().strip()))
-					a=a+1
-				list_verif.append(aux)
-			print(list_verif,"\n")
-			if list_verif!=matrice_med:
-				win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
-			else:
-				timp = time.time() - start_time
-				score=4000-int(timp)
-				win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
-		except:
-			win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
-class MyCustomFrame3(wx.Frame):
-	def __init__(self,parent,id):
-		mat_hard=copy.deepcopy(matrice_hard)
-		wx.Frame.__init__(self,parent,id,'SUDOKU - Hard Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
-		panel=wx.Panel(self)
-		font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-		button_verificare=wx.Button(self, label="Verify", pos=(156,466), size=(152,46))	
-		button_verificare.SetFont(font2)
-		self.Bind(wx.EVT_BUTTON,self.Verify, button_verificare)
-		self.Bind(wx.EVT_PAINT,self.OnPaint)
-		font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-		for k in range(2):
-			x=randint(0,8)
-			y=randint(0,8)
-			if mat_hard[x][y]!=' ':
-				mat_hard[x][y]=' '
-			else: 
-				k=k-1
-		for i in range(9):
-			for j in range(9):
-				if (mat_hard[i][j]!=' '):
-					b=self.edit = wx.TextCtrl(self, style=wx.TE_CENTER|wx.TE_READONLY, pos=(52*i, 52*j),size=(48,48))
+					self.edit.ChangeValue("Number only")
+			def Verify(self, event):
+				try:
+					a=0
+					list_verif=[]
+					for nr1 in range (9):
+						aux=[]
+						for nr2 in range (9):
+							aux.append(int(casute[a].GetValue().strip()))
+							a=a+1
+						list_verif.append(aux)
+					print(list_verif,"\n")
+					if list_verif!=matrice_med:
+						win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
+					else:
+						timp = time.time() - start_time
+						score=4000-int(timp)
+						win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
+				except:
+					win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
+class MyCustomFrame3(wx.Frame,threading.Thread):
+		# if mutex.locked():
+			# print("ERROR!!")
+		# else:		
+			def __init__(self,parent,id):
+				mutex.acquire()
+				mat_hard=copy.deepcopy(matrice_hard)
+				threading.Thread.__init__(self)
+				wx.Frame.__init__(self,parent,id,'SUDOKU - Hard Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
+				panel=wx.Panel(self)
+				font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+				button_verificare=wx.Button(self, label="Verify", pos=(156,466), size=(152,46))	
+				button_verificare.SetFont(font2)
+				self.Bind(wx.EVT_BUTTON,self.Verify, button_verificare)
+				self.Bind(wx.EVT_PAINT,self.OnPaint)
+				self.Bind(wx.EVT_CLOSE,self.closewindow)
+				font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
+				for k in range(60):
+					x=randint(0,8)
+					y=randint(0,8)
+					if mat_hard[x][y]!=' ':
+						mat_hard[x][y]=' '
+					else: 
+						k=k-1
+				for i in range(9):
+					for j in range(9):
+						if (mat_hard[i][j]!=' '):
+							b=self.edit = wx.TextCtrl(self, style=wx.TE_CENTER|wx.TE_READONLY, pos=(52*i, 52*j),size=(48,48))
+						else:
+							b=self.edit = wx.TextCtrl(self, style=wx.TE_CENTER, pos=(52*i, 52*j),size=(48,48))
+							b.SetForegroundColour(wx.BLUE)
+						b.SetValue(str(mat_hard[i][j]).strip())
+						b.SetFont(font1)
+						casute.append(b)
+						b.Bind(wx.EVT_TEXT_ENTER, self.onAction)
+			def OnPaint(self,evt):
+				self.dc = dc = wx.PaintDC(self)
+				dc.BeginDrawing()
+				dc.SetPen(wx.Pen("BLACK", 4))
+				dc.DrawLine(154,0,154,462)
+				dc.DrawLine(310,0,310,462)
+				dc.DrawLine(0,154,462,154)
+				dc.DrawLine(0,310,462,310)
+				self.dc.EndDrawing()
+			def run(self):
+				#logging.info("From %s(thread_name)\n" % {"thread_name":self.getName()})
+				Thread3 = MyCustomFrame3(parent=None,id=-1)
+				print "Starting " + self.name
+				Thread3 = Thread(target = self.__init__)
+				Thread3.start()
+			def closewindow(self,event):
+				mutex.release()
+				self.Destroy()
+			def onAction(self, event):
+				raw_value = self.edit.GetValue().strip()
+				if all(x in '0123456789.+-' for x in raw_value):
+					self.value = round(float(raw_value), 2)
+					self.edit.ChangeValue(str(self.value))
 				else:
-					b=self.edit = wx.TextCtrl(self, style=wx.TE_CENTER, pos=(52*i, 52*j),size=(48,48))
-					b.SetForegroundColour(wx.BLUE)
-				b.SetValue(str(mat_hard[i][j]).strip())
-				b.SetFont(font1)
-				casute.append(b)
-				b.Bind(wx.EVT_TEXT_ENTER, self.onAction)
-	def OnPaint(self,evt):
-		self.dc = dc = wx.PaintDC(self)
-		dc.BeginDrawing()
-		dc.SetPen(wx.Pen("BLACK", 4))
-		dc.DrawLine(154,0,154,462)
-		dc.DrawLine(310,0,310,462)
-		dc.DrawLine(0,154,462,154)
-		dc.DrawLine(0,310,462,310)
-		self.dc.EndDrawing()
-	def onAction(self, event):
-		raw_value = self.edit.GetValue().strip()
-		if all(x in '0123456789.+-' for x in raw_value):
-			self.value = round(float(raw_value), 2)
-			self.edit.ChangeValue(str(self.value))
-		else:
-			self.edit.ChangeValue("Number only")
-	def Verify(self, event):
-		try:
-			a=0
-			list_verif=[]
-			for nr1 in range (9):
-				aux=[]
-				for nr2 in range (9):
-					aux.append(int(casute[a].GetValue().strip()))
-					a=a+1
-				list_verif.append(aux)
-			print(list_verif,"\n")
-			#print(matrice)
-			if list_verif!=matrice_hard:
-				win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
-			else:
-				timp = time.time() - start_time
-				score=5000-int(timp)
-				win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
-		except:
-			win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
-
+					self.edit.ChangeValue("Number only")
+			def Verify(self, event):
+				try:
+					a=0
+					list_verif=[]
+					for nr1 in range (9):
+						aux=[]
+						for nr2 in range (9):
+							aux.append(int(casute[a].GetValue().strip()))
+							a=a+1
+						list_verif.append(aux)
+					print(list_verif,"\n")
+					#print(matrice)
+					if list_verif!=matrice_hard:
+						win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
+					else:
+						timp = time.time() - start_time
+						score=5000-int(timp)
+						win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
+				except:
+					win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
 if __name__ == '__main__':
 	app=wx.PySimpleApp()
 	frame=fr(parent=None,id=-1)
