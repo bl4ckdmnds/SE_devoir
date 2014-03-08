@@ -14,6 +14,7 @@ mateasy=[]
 matmed=[]
 mathard=[]
 casute=[]
+butoane=[]
 mutex = Lock()
 #mutex.release()
 start_time = time.time()
@@ -29,6 +30,9 @@ class fr(wx.Frame):
 		button_easy.SetFont(font2)
 		button_medium.SetFont(font2)
 		button_hard.SetFont(font2)
+		butoane.append(button_easy)
+		butoane.append(button_medium)
+		butoane.append(button_hard)
 		self.Bind(wx.EVT_BUTTON,self.sudoku1, button_easy)
 		self.Bind(wx.EVT_BUTTON,self.sudoku2, button_medium)
 		self.Bind(wx.EVT_BUTTON,self.sudoku3, button_hard)
@@ -36,7 +40,7 @@ class fr(wx.Frame):
 		menubar=wx.MenuBar()
 		first=wx.Menu()
 		second=wx.Menu()
-		open=first.Append(wx.NewId(),"Open","This will open a new window")
+		#open=first.Append(wx.NewId(),"Open","This will open a new window")
 		exit=first.Append(wx.NewId(),"Exit","Exit the program")
 		high=second.Append(wx.NewId(),"Highscore","Shows the top of your performances")
 		howto=second.Append(wx.NewId(),"HowTo","Shows the sudoku rules")
@@ -45,21 +49,25 @@ class fr(wx.Frame):
 		self.SetMenuBar(menubar)
 		self.Bind(wx.EVT_MENU,self.closegame,exit)
 		self.Bind(wx.EVT_MENU,self.showhelp,howto)
+		self.Bind(wx.EVT_MENU,self.High_sc,high)
 	def closegame(self,event):
 		self.Close(True)
 	def showhelp(self,event):
 		helpwindow=fr2(parent=None,id=-1)
 		helpwindow.Show()
+	def High_sc(self,event):
+		high_score=fr2(parent=None,id=-1)
+		high_score.Show()
 	def sudoku1(self,event):
-		game=MyCustomFrame(parent=None,id=-1)
+		game=MyCustomFrame(parent=self,id=1)
 		start_time = time.time()
 		game.Show()
 	def sudoku2(self,event):
-		game=MyCustomFrame2(parent=None,id=-1)
+		game=MyCustomFrame2(parent=self,id=2)
 		game.Show()
 		start_time = time.time()
 	def sudoku3(self,event):
-		game=MyCustomFrame3(parent=None,id=-1)
+		game=MyCustomFrame3(parent=self,id=3)
 		game.Show()
 		start_time = time.time()
 class fr2(wx.Frame):
@@ -71,9 +79,12 @@ class MyCustomFrame(wx.Frame,threading.Thread):
 		# if mutex.locked():
 			# print("ERROR!!")
 		# else:		
-			def __init__(self,parent,id):
+			def __init__(self,parent,id=-1):
 				mateasy=copy.deepcopy(matrice_easy)
 				mutex.acquire()
+				butoane[0].Disable()
+				butoane[1].Disable()
+				butoane[2].Disable()
 				threading.Thread.__init__(self)
 				wx.Frame.__init__(self,parent,id,'SUDOKU - Easy Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
 				panel=wx.Panel(self)
@@ -105,6 +116,9 @@ class MyCustomFrame(wx.Frame,threading.Thread):
 			def closewindow(self,event):
 				self.Destroy()
 				mutex.release()
+				butoane[0].Enable()
+				butoane[1].Enable()
+				butoane[2].Enable()
 			def run(self):
 				logging.info("From %s(thread_name)\n" % {"thread_name":self.getName()})
 				Thread1 = MyCustomFrame(parent=None,id=-1)
@@ -158,6 +172,9 @@ class MyCustomFrame2(wx.Frame,threading.Thread):
 				threading.Thread.__init__(self)
 				wx.Frame.__init__(self,parent,id,'SUDOKU - Medium Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
 				panel=wx.Panel(self)
+				butoane[0].Disable()
+				butoane[1].Disable()
+				butoane[2].Disable()
 				font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
 				button_verificare=wx.Button(self, label="Verify", pos=(156,466), size=(152,46))	
 				button_verificare.SetFont(font2)
@@ -201,6 +218,9 @@ class MyCustomFrame2(wx.Frame,threading.Thread):
 			def closewindow(self,event):
 				mutex.release()
 				self.Destroy()
+				butoane[0].Enable()
+				butoane[1].Enable()
+				butoane[2].Enable()
 			def onAction(self, event):
 				raw_value = self.edit.GetValue().strip()
 				if all(x in '0123456789.+-' for x in raw_value):
@@ -237,6 +257,9 @@ class MyCustomFrame3(wx.Frame,threading.Thread):
 				threading.Thread.__init__(self)
 				wx.Frame.__init__(self,parent,id,'SUDOKU - Hard Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
 				panel=wx.Panel(self)
+				butoane[0].Disable()
+				butoane[1].Disable()
+				butoane[2].Disable()
 				font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
 				button_verificare=wx.Button(self, label="Verify", pos=(156,466), size=(152,46))	
 				button_verificare.SetFont(font2)
@@ -280,6 +303,9 @@ class MyCustomFrame3(wx.Frame,threading.Thread):
 			def closewindow(self,event):
 				mutex.release()
 				self.Destroy()
+				butoane[0].Enable()
+				butoane[1].Enable()
+				butoane[2].Enable()
 			def onAction(self, event):
 				raw_value = self.edit.GetValue().strip()
 				if all(x in '0123456789.+-' for x in raw_value):
@@ -311,8 +337,7 @@ class MyCustomFrame3(wx.Frame,threading.Thread):
 def main(argv=None):
 	logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',filename='Sudoku.log', level=logging.INFO)
 	logging.info('Started')
-	logging.info('Finished')
-					
+	logging.info('Finished')			
 if __name__ == '__main__':
 	app=wx.PySimpleApp()
 	main()
