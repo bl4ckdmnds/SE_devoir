@@ -60,17 +60,21 @@ class fr(wx.Frame):
 		exit=first.Append(wx.NewId(),"Exit","Exit the program")
 		high=second.Append(wx.NewId(),"Highscore","Shows the top of your performances")
 		howto=second.Append(wx.NewId(),"HowTo","Shows the sudoku rules")
+		about=second.Append(wx.NewId(),"About","Credits")
+		
 		menubar.Append(first,"File")
 		menubar.Append(second,"Game")
 		self.SetMenuBar(menubar)
 		self.Bind(wx.EVT_MENU,self.closegame,exit)
 		self.Bind(wx.EVT_MENU,self.showhelp,howto)
 		self.Bind(wx.EVT_MENU,self.High_sc,high)
+		self.Bind(wx.EVT_MENU,self.showabout,about)
+		
 	def closegame(self,event):
 		self.Close(True)
 	def showabout(self,event):
 		aboutwindow = fr3(parent=None,id=-1)
-		aboutwindow.show()
+		aboutwindow.Show()
 	def showhelp(self,event):
 		logging.info('Help Window created within fr Frame')
 		helpwindow=fr2(parent=None,id=-1)
@@ -78,7 +82,6 @@ class fr(wx.Frame):
 	def High_sc(self,event):
 		logging.info('High Score Window created within fr Frame')
 		high_score=fr4(parent=None,id=-1)
-		
 		high_score.Show()
 	def sudoku1(self,event):
 		logging.info('Button1 was pressed on fr Frame')
@@ -95,28 +98,38 @@ class fr(wx.Frame):
 		game=MyCustomFrame3(parent=self,id=3)
 		game.Show()
 		start_time = time.time()
+		
 class fr2(wx.Frame):
 	def __init__(self,parent,id):
 		wx.Frame.__init__(self,parent,id,'How To Play Sudoku',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,pos=(500,200),size=(390,390))
 		panel=wx.Panel(self)
-		text=wx.StaticText(panel,-1,"Rules of playing sudoku", (150,30))
+		titlu=wx.StaticText(panel,-1,"Rules of playing sudoku", (150,30))
+		text=wx.TextCtrl(panel,style=wx.TE_MULTILINE|wx.TE_READONLY, pos=(50, 50),size=(300,220))
+		text.SetValue("La plupart du temps, le jeu est propose sous la forme d'une grille de 9x9 et compose de sous-grilles de 3x3, appelees regions. Quelques cellules contiennent des chiffres, dits devoiles. Le but du jeu est de remplir ces cases avec des chiffres allant de 1 a 9 en veillant toujours a ce qu'un meme chiffre ne figure qu'une seule fois par colonne, une seule fois par ligne, et une seule fois par carre de neuf cases. Un minimum de 17 cellules doivent etre precompletees.\n\n")
+		text.AppendText("Niveaux de dificultes:\n")
+		text.AppendText("1.Easy 35-45 cellules precompletees\n")
+		text.AppendText("2.Medium 25-34 cellules precompletees\n")
+		text.AppendText("3.Hard 17-24 cellules precompletees\n")
+		
 class fr3(wx.Frame):
-		def __init__(self,parent,id):
-			wx.Frame.__init__(self,parent,id,'About',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,pos=(500,200),size=(390,390))
-			panel=wx.Panel(self)
-			text=wx.TextCtrl(panel,style=wx.TE_MULTILINE|wx.TE_READONLY, pos=(50, 50),size=(300,220))
-			text.SetValue("2014 - Cuckoo Entertainment. All rights reserved\n") 
-			text.AppendText("\n")
-			text.AppendText("Game Team\n")
-			text.AppendText("Programmer: Cucu Andreea\n")
-			text.AppendText("Programmer/Game Designer: Nichifor Cosmin\n")
-			text.AppendText("Artist: Radutu Anca\n")
-			text.AppendText("Programmer/Game Designer: Stanica Iulia\n")
+	def __init__(self,parent,id):
+		wx.Frame.__init__(self,parent,id,'About',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,pos=(500,200),size=(390,390))
+		panel=wx.Panel(self)
+		text=wx.TextCtrl(panel,style=wx.TE_MULTILINE|wx.TE_READONLY, pos=(50, 50),size=(300,220))
+		text.SetValue("2014 - Cuckoo Entertainment. All rights reserved\n") 
+		text.AppendText("\n")
+		text.AppendText("Game Team\n")
+		text.AppendText("Programmer: Cucu Andreea\n")
+		text.AppendText("Programmer/Game Designer: Nichifor Cosmin\n")
+		text.AppendText("Artist: Radutu Anca\n")
+		text.AppendText("Programmer/Game Designer: Stanica Iulia\n")
+		
 class fr4(wx.Frame):
 	def __init__(self,parent,id):
 		wx.Frame.__init__(self,parent,id,'Your Highscore',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,pos=(500,200),size=(390,90))
 		panel=wx.Panel(self)
 		text=wx.StaticText(panel,-1,"Your all time highscore is: "+max, (125,30))
+		
 class MyCustomFrame(wx.Frame,threading.Thread):		
 			def __init__(self,parent,id=-1):
 				logging.info("Frame type MyCustomFrame created")
@@ -136,7 +149,7 @@ class MyCustomFrame(wx.Frame,threading.Thread):
 				self.Bind(wx.EVT_PAINT,self.OnPaint)
 				self.Bind(wx.EVT_CLOSE,self.closewindow)
 				font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-				for k in range(45):
+				for k in range(48):
 					x=randint(0,8)
 					y=randint(0,8)
 					if mateasy[x][y]!=' ':
@@ -153,11 +166,11 @@ class MyCustomFrame(wx.Frame,threading.Thread):
 						b.SetValue(str(mateasy[i][j]).strip())
 						b.SetFont(font1)
 						casute.append(b)
-						b.Bind(wx.EVT_TEXT_ENTER, self.onAction)
+						
 			def closewindow(self,event):
 				self.Destroy()
 				mutex.release()
-				logging.info('MyCustomFrame3 has been disposed')
+				logging.info('MyCustomFrame has been disposed')
 				butoane[0].Enable()
 				butoane[1].Enable()
 				butoane[2].Enable()
@@ -168,6 +181,7 @@ class MyCustomFrame(wx.Frame,threading.Thread):
 				print "Starting " + self.name
 				Thread1 = Thread(target = MyCustomFrame.__init__)
 				Thread1.start()
+				
 			def OnPaint(self,evt):
 				self.dc = dc = wx.PaintDC(self)
 				dc.BeginDrawing()
@@ -177,13 +191,7 @@ class MyCustomFrame(wx.Frame,threading.Thread):
 				dc.DrawLine(0,154,462,154)
 				dc.DrawLine(0,310,462,310)
 				self.dc.EndDrawing()
-			def onAction(self, event):
-				raw_value = self.edit.GetValue().strip()
-				if all(x in '0123456789.+-' for x in raw_value):
-					self.value = round(float(raw_value), 2)
-					self.edit.ChangeValue(str(self.value))
-				else:
-					self.edit.ChangeValue("Number only")
+			
 			def Verify(self, event):
 				try:
 					a=0
@@ -195,9 +203,24 @@ class MyCustomFrame(wx.Frame,threading.Thread):
 							a=a+1
 						list_verif.append(aux)
 					logging.info("Verify function was called")
-					logging.info(list_verif,"\n")
+				
 					logging.info(matrice_easy)
+					v1=[]	
+					v2=[]
 					if list_verif!=matrice_easy:
+						for n1 in range (9):
+							for n2 in range (9):
+								if not(list_verif[n1][n2]==matrice_easy[n1][n2]):
+									print(list_verif[n1][n2])
+									v1.append(n1)
+									v2.append(n2)
+									
+						print(v1)
+						print(v2)
+						indice=0						
+						for ceva in v1:
+							casute[ceva*9+v2[indice]].SetForegroundColour(wx.RED)
+							indice=indice+1
 						win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
 					else:
 						timp = time.time() - start_time
@@ -248,7 +271,7 @@ class MyCustomFrame2(wx.Frame,threading.Thread):
 						b.SetValue(str(mat_med[i][j]).strip())
 						b.SetFont(font1)
 						casute.append(b)
-						b.Bind(wx.EVT_TEXT_ENTER, self.onAction)
+						
 			def OnPaint(self,evt):
 				self.dc = dc = wx.PaintDC(self)
 				dc.BeginDrawing()
@@ -272,13 +295,7 @@ class MyCustomFrame2(wx.Frame,threading.Thread):
 				butoane[1].Enable()
 				butoane[2].Enable()
 				logging.info("Buttons from fr Frame were enabled")
-			def onAction(self, event):
-				raw_value = self.edit.GetValue().strip()
-				if all(x in '0123456789.+-' for x in raw_value):
-					self.value = round(float(raw_value), 2)
-					self.edit.ChangeValue(str(self.value))
-				else:
-					self.edit.ChangeValue("Number only")
+			
 			def Verify(self, event):
 				try:
 					a=0
@@ -289,10 +306,26 @@ class MyCustomFrame2(wx.Frame,threading.Thread):
 							aux.append(int(casute[a].GetValue().strip()))
 							a=a+1
 						list_verif.append(aux)
-					logging.info(list_verif,"\n")
+					
 					logging.info(matrice_med)
 					logging.info("Verify function was called")
+					
+					v1=[]	
+					v2=[]
 					if list_verif!=matrice_med:
+						for n1 in range (9):
+							for n2 in range (9):
+								if not(list_verif[n1][n2]==matrice_med[n1][n2]):
+									print(list_verif[n1][n2])
+									v1.append(n1)
+									v2.append(n2)
+									
+						print(v1)
+						print(v2)
+						indice=0						
+						for ceva in v1:
+							casute[ceva*9+v2[indice]].SetForegroundColour(wx.RED)
+							indice=indice+1
 						logging.info("Desole ! Il y a encore des chiffres mal mises")
 						win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
 					else:
@@ -308,6 +341,7 @@ class MyCustomFrame2(wx.Frame,threading.Thread):
 						win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
 				except:
 					win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
+					
 class MyCustomFrame3(wx.Frame,threading.Thread):	
 			def __init__(self,parent,id):
 				mutex.acquire()
@@ -344,7 +378,7 @@ class MyCustomFrame3(wx.Frame,threading.Thread):
 						b.SetValue(str(mat_hard[i][j]).strip())
 						b.SetFont(font1)
 						casute.append(b)
-						b.Bind(wx.EVT_TEXT_ENTER, self.onAction)
+						
 			def OnPaint(self,evt):
 				self.dc = dc = wx.PaintDC(self)
 				dc.BeginDrawing()
@@ -368,13 +402,7 @@ class MyCustomFrame3(wx.Frame,threading.Thread):
 				butoane[1].Enable()
 				butoane[2].Enable()
 				logging.info("Buttons from fr Frame were enabled")
-			def onAction(self, event):
-				raw_value = self.edit.GetValue().strip()
-				if all(x in '0123456789.+-' for x in raw_value):
-					self.value = round(float(raw_value), 2)
-					self.edit.ChangeValue(str(self.value))
-				else:
-					self.edit.ChangeValue("Number only")
+			
 			def Verify(self, event):
 				try:
 					a=0
@@ -387,7 +415,22 @@ class MyCustomFrame3(wx.Frame,threading.Thread):
 						list_verif.append(aux)
 					logging.info("Verify function was called")
 					logging.info(matrice_hard)
+					v1=[]	
+					v2=[]
 					if list_verif!=matrice_hard:
+						for n1 in range (9):
+							for n2 in range (9):
+								if not(list_verif[n1][n2]==matrice_hard[n1][n2]):
+									print(list_verif[n1][n2])
+									v1.append(n1)
+									v2.append(n2)
+									
+						print(v1)
+						print(v2)
+						indice=0						
+						for ceva in v1:
+							casute[ceva*9+v2[indice]].SetForegroundColour(wx.RED)
+							indice=indice+1
 						logging.info("Desole ! Il y a encore des chiffres mal mises")
 						win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
 					else:
@@ -403,11 +446,11 @@ class MyCustomFrame3(wx.Frame,threading.Thread):
 						win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
 				except:
 					win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
-					logging.info("Completez seulement avec des chiffres entre 1 et 9")		
+					logging.info("Completez seulement avec des chiffres entre 1 et 9")
+					
 if __name__ == '__main__':
 	app=wx.PySimpleApp()
 	logging.info('Started')
-	#logging.info(f.readline())
 	frame=fr(parent=None,id=-1)
 	frame.Show()
 	app.MainLoop()
