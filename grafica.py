@@ -1,18 +1,3 @@
-"""
-Le premier projet en Python
-	* utilisation de l'interface graphique
-	* les processus
-	* les fils d'execution
-	* la section critique
-	* le mechanisme de verrouillage entre les fils d'execution
-	* utilisation des evenements
-	* 
-	* le logger
-
-@authors Andreea CUCU, Cosmin NICHIFOR, Anca RADUTU, Iulia STANICA
-@version 1.0
-@date 01.March.2014 - 08.March.2014
-"""
 import wx
 import time
 from random import randint
@@ -27,15 +12,12 @@ mateasy=[]
 matmed=[]
 mathard=[]
 casute=[]
-butoane=[]
 mutex = Lock()
-logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',filename='Sudoku.log', level=logging.INFO)
-logging.info('Started')
+#mutex.release()
 start_time = time.time()
 timp = time.time()
 class fr(wx.Frame):
 	def __init__(self,parent,id):
-		logging.info("Frame type fr created")
 		wx.Frame.__init__(self,parent,id,'SUDOKU',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(390,390))
 		panel=wx.Panel(self)
 		font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
@@ -45,9 +27,6 @@ class fr(wx.Frame):
 		button_easy.SetFont(font2)
 		button_medium.SetFont(font2)
 		button_hard.SetFont(font2)
-		butoane.append(button_easy)
-		butoane.append(button_medium)
-		butoane.append(button_hard)
 		self.Bind(wx.EVT_BUTTON,self.sudoku1, button_easy)
 		self.Bind(wx.EVT_BUTTON,self.sudoku2, button_medium)
 		self.Bind(wx.EVT_BUTTON,self.sudoku3, button_hard)
@@ -55,54 +34,70 @@ class fr(wx.Frame):
 		menubar=wx.MenuBar()
 		first=wx.Menu()
 		second=wx.Menu()
+		open=first.Append(wx.NewId(),"Open","This will open a new window")
 		exit=first.Append(wx.NewId(),"Exit","Exit the program")
 		high=second.Append(wx.NewId(),"Highscore","Shows the top of your performances")
 		howto=second.Append(wx.NewId(),"HowTo","Shows the sudoku rules")
+		about=second.Append(wx.NewId(),"About","Credits")
+		
 		menubar.Append(first,"File")
 		menubar.Append(second,"Game")
 		self.SetMenuBar(menubar)
 		self.Bind(wx.EVT_MENU,self.closegame,exit)
 		self.Bind(wx.EVT_MENU,self.showhelp,howto)
-		self.Bind(wx.EVT_MENU,self.High_sc,high)
+		self.Bind(wx.EVT_MENU,self.showabout,about)
+		
 	def closegame(self,event):
 		self.Close(True)
 	def showhelp(self,event):
-		logging.info('Help Window created within fr Frame')
 		helpwindow=fr2(parent=None,id=-1)
-		helpwindow.Show()
-	def High_sc(self,event):
-		logging.info('High Score Window created within fr Frame')
-		high_score=fr2(parent=None,id=-1)
-		high_score.Show()
+		helpwindow.Show()	
+	def showabout(self,about):
+		aboutwindow=fr3(parent=None,id=-1)
+		aboutwindow.Show()
 	def sudoku1(self,event):
-		logging.info('Button1 was pressed on fr Frame')
-		game=MyCustomFrame(parent=self,id=1)
+		game=MyCustomFrame(parent=None,id=-1)
 		start_time = time.time()
 		game.Show()
 	def sudoku2(self,event):
-		logging.info('Button2 was pressed on fr Frame')
-		game=MyCustomFrame2(parent=self,id=2)
+		game=MyCustomFrame2(parent=None,id=-1)
 		game.Show()
 		start_time = time.time()
 	def sudoku3(self,event):
-		logging.info('Button3 was pressed on fr Frame')
-		game=MyCustomFrame3(parent=self,id=3)
+		game=MyCustomFrame3(parent=None,id=-1)
 		game.Show()
 		start_time = time.time()
 class fr2(wx.Frame):
 	def __init__(self,parent,id):
 		wx.Frame.__init__(self,parent,id,'How To Play Sudoku',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,pos=(500,200),size=(390,390))
 		panel=wx.Panel(self)
-		text=wx.StaticText(panel,-1,"Rules of playing sudoku", (150,30))
-class MyCustomFrame(wx.Frame,threading.Thread):		
-			def __init__(self,parent,id=-1):
-				logging.info("Frame type MyCustomFrame created")
+		titlu=wx.StaticText(panel,-1,"Rules of playing sudoku", (150,30))
+		text=wx.TextCtrl(panel,style=wx.TE_MULTILINE|wx.TE_READONLY, pos=(50, 50),size=(300,220))
+		text.SetValue("La plupart du temps, le jeu est propose sous la forme d'une grille de 9x9 et compose de sous-grilles de 3x3, appelees regions. Quelques cellules contiennent des chiffres, dits devoiles. Le but du jeu est de remplir ces cases avec des chiffres allant de 1 a 9 en veillant toujours a ce qu'un meme chiffre ne figure qu'une seule fois par colonne, une seule fois par ligne, et une seule fois par carre de neuf cases. Un minimum de 17 cellules doivent etre precompletees.\n\n")
+		text.AppendText("Niveaux de dificultes:\n")
+		text.AppendText("1.Easy 35-45 cellules precompletees\n")
+		text.AppendText("2.Medium 25-34 cellules precompletees\n")
+		text.AppendText("3.Hard 17-24 cellules precompletees\n")
+		
+class fr3(wx.Frame):
+		def __init__(self,parent,id):
+			wx.Frame.__init__(self,parent,id,'About',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,pos=(500,200),size=(390,390))
+			panel=wx.Panel(self)
+			text=wx.TextCtrl(panel,style=wx.TE_MULTILINE|wx.TE_READONLY, pos=(50, 50),size=(300,220))
+			text.SetValue("2014 - Cuckoo Entertainment. All rights reserved\n") 
+			text.AppendText("\n")
+			text.AppendText("Game Team\n")
+			text.AppendText("Programmer: Cucu Andreea\n")
+			text.AppendText("Programmer/Game Designer: Nichifor Cosmin\n")
+			text.AppendText("Artist: Radutu Anca\n")
+			text.AppendText("Programmer/Game Designer: Stanica Iulia\n")
+class MyCustomFrame(wx.Frame,threading.Thread):
+		# if mutex.locked():
+			# print("ERROR!!")
+		# else:		
+			def __init__(self,parent,id):
 				mateasy=copy.deepcopy(matrice_easy)
 				mutex.acquire()
-				butoane[0].Disable()
-				butoane[1].Disable()
-				butoane[2].Disable()
-				logging.info("Buttons from fr Frame were disabled")
 				threading.Thread.__init__(self)
 				wx.Frame.__init__(self,parent,id,'SUDOKU - Easy Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
 				panel=wx.Panel(self)
@@ -134,11 +129,6 @@ class MyCustomFrame(wx.Frame,threading.Thread):
 			def closewindow(self,event):
 				self.Destroy()
 				mutex.release()
-				logging.info('MyCustomFrame3 has been disposed')
-				butoane[0].Enable()
-				butoane[1].Enable()
-				butoane[2].Enable()
-				logging.info("Buttons from fr Frame were enabled")
 			def run(self):
 				logging.info("From %s(thread_name)\n" % {"thread_name":self.getName()})
 				Thread1 = MyCustomFrame(parent=None,id=-1)
@@ -171,7 +161,6 @@ class MyCustomFrame(wx.Frame,threading.Thread):
 							aux.append(int(casute[a].GetValue().strip()))
 							a=a+1
 						list_verif.append(aux)
-					logging.info("Verify function was called")
 					print(list_verif,"\n")
 					print(matrice_easy)
 					if list_verif!=matrice_easy:
@@ -182,18 +171,17 @@ class MyCustomFrame(wx.Frame,threading.Thread):
 						win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
 				except:
 					win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
+			#mutex.release()
 class MyCustomFrame2(wx.Frame,threading.Thread):
+		# if mutex.locked():
+			# print("ERROR!!")
+		# else:	
 			def __init__(self,parent,id):
-				logging.info("Frame type MyCustomFrame2 created")
 				mutex.acquire()
 				mat_med=copy.deepcopy(matrice_med)
 				threading.Thread.__init__(self)
 				wx.Frame.__init__(self,parent,id,'SUDOKU - Medium Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
 				panel=wx.Panel(self)
-				butoane[0].Disable()
-				butoane[1].Disable()
-				butoane[2].Disable()
-				logging.info("Buttons from fr Frame were disabled")
 				font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
 				button_verificare=wx.Button(self, label="Verify", pos=(156,466), size=(152,46))	
 				button_verificare.SetFont(font2)
@@ -236,12 +224,7 @@ class MyCustomFrame2(wx.Frame,threading.Thread):
 				Thread2.start()
 			def closewindow(self,event):
 				mutex.release()
-				logging.info('MyCustomFrame2 has been disposed')
 				self.Destroy()
-				butoane[0].Enable()
-				butoane[1].Enable()
-				butoane[2].Enable()
-				logging.info("Buttons from fr Frame were enabled")
 			def onAction(self, event):
 				raw_value = self.edit.GetValue().strip()
 				if all(x in '0123456789.+-' for x in raw_value):
@@ -259,7 +242,6 @@ class MyCustomFrame2(wx.Frame,threading.Thread):
 							aux.append(int(casute[a].GetValue().strip()))
 							a=a+1
 						list_verif.append(aux)
-					logging.info("Verify function was called")
 					print(list_verif,"\n")
 					if list_verif!=matrice_med:
 						win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
@@ -269,18 +251,16 @@ class MyCustomFrame2(wx.Frame,threading.Thread):
 						win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
 				except:
 					win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
-class MyCustomFrame3(wx.Frame,threading.Thread):	
+class MyCustomFrame3(wx.Frame,threading.Thread):
+		# if mutex.locked():
+			# print("ERROR!!")
+		# else:		
 			def __init__(self,parent,id):
 				mutex.acquire()
-				logging.info("Frame type MyCustomFrame3 created")
 				mat_hard=copy.deepcopy(matrice_hard)
 				threading.Thread.__init__(self)
 				wx.Frame.__init__(self,parent,id,'SUDOKU - Hard Mode',style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,size=(471,543))
 				panel=wx.Panel(self)
-				butoane[0].Disable()
-				butoane[1].Disable()
-				butoane[2].Disable()
-				logging.info("Buttons from fr Frame were disabled")
 				font2 = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
 				button_verificare=wx.Button(self, label="Verify", pos=(156,466), size=(152,46))	
 				button_verificare.SetFont(font2)
@@ -323,12 +303,7 @@ class MyCustomFrame3(wx.Frame,threading.Thread):
 				Thread3.start()
 			def closewindow(self,event):
 				mutex.release()
-				logging.info('MyCustomFrame3 has been disposed')
 				self.Destroy()
-				butoane[0].Enable()
-				butoane[1].Enable()
-				butoane[2].Enable()
-				logging.info("Buttons from fr Frame were enabled")
 			def onAction(self, event):
 				raw_value = self.edit.GetValue().strip()
 				if all(x in '0123456789.+-' for x in raw_value):
@@ -347,7 +322,7 @@ class MyCustomFrame3(wx.Frame,threading.Thread):
 							a=a+1
 						list_verif.append(aux)
 					print(list_verif,"\n")
-					logging.info("Verify function was called")
+					#print(matrice)
 					if list_verif!=matrice_hard:
 						win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
 					else:
@@ -356,10 +331,15 @@ class MyCustomFrame3(wx.Frame,threading.Thread):
 						win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
 				except Exception as err:
 					win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
-					logging.info("Completez seulement avec des chiffres entre 1 et 9")		
+					logging.info("Completez seulement avec des chiffres entre 1 et 9")
+def main(argv=None):
+	logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',filename='Sudoku.log', level=logging.INFO)
+	logging.info('Started')
+	logging.info('Finished')
+					
 if __name__ == '__main__':
 	app=wx.PySimpleApp()
-	logging.info('Started')
+	main()
 	frame=fr(parent=None,id=-1)
 	frame.Show()
 	app.MainLoop()
