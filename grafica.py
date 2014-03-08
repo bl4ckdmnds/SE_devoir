@@ -108,7 +108,7 @@ class MyCustomFrame(wx.Frame,threading.Thread):
 				self.Bind(wx.EVT_PAINT,self.OnPaint)
 				self.Bind(wx.EVT_CLOSE,self.closewindow)
 				font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-				for k in range(45):
+				for k in range(2):
 					x=randint(0,8)
 					y=randint(0,8)
 					if mateasy[x][y]!=' ':
@@ -163,13 +163,28 @@ class MyCustomFrame(wx.Frame,threading.Thread):
 						list_verif.append(aux)
 					print(list_verif,"\n")
 					print(matrice_easy)
-					if list_verif!=matrice_easy:
-						win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
-					else:
+					v1=[]	
+					v2=[]
+					if list_verif==matrice_easy:
 						timp = time.time() - start_time
 						score=3000-int(timp)
 						win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
-				except:
+					else:
+						for n1 in range (9):
+							for n2 in range (9):
+								if not(list_verif[n1][n2]==matrice_easy[n1][n2]):
+									print(list_verif[n1][n2])
+									v1.append(n1)
+									v2.append(n2)
+									
+						print(v1)
+						print(v2)
+						indice=0						
+						for ceva in v1:
+							casute[ceva*9+v2[indice]].SetForegroundColour(wx.RED)
+							indice=indice+1
+						win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
+				except:					
 					win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
 			#mutex.release()
 class MyCustomFrame2(wx.Frame,threading.Thread):
@@ -189,7 +204,7 @@ class MyCustomFrame2(wx.Frame,threading.Thread):
 				self.Bind(wx.EVT_PAINT,self.OnPaint)
 				self.Bind(wx.EVT_CLOSE,self.closewindow)
 				font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-				for k in range(53):
+				for k in range(3):
 					x=randint(0,8)
 					y=randint(0,8)
 					if mat_med[x][y]!=' ':
@@ -242,15 +257,33 @@ class MyCustomFrame2(wx.Frame,threading.Thread):
 							aux.append(int(casute[a].GetValue().strip()))
 							a=a+1
 						list_verif.append(aux)
+					logging.info("Verify function was called")
 					print(list_verif,"\n")
-					if list_verif!=matrice_med:
-						win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
-					else:
+					print(matrice_med)
+					
+					v1=[]	
+					v2=[]
+					if list_verif==matrice_med:
 						timp = time.time() - start_time
-						score=4000-int(timp)
+						score=3000-int(timp)
 						win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
+					else:
+						for n1 in range (9):
+							for n2 in range (9):
+								if not(list_verif[n1][n2]==matrice_med[n1][n2]):
+									print(list_verif[n1][n2])
+									v1.append(n1)
+									v2.append(n2)
+									
+						print(v1)
+						print(v2)
+						indice=0						
+						for ceva in v1:
+							casute[ceva*9+v2[indice]].SetForegroundColour(wx.RED)
+							indice=indice+1
+						win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
 				except:
-					win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
+					win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')		
 class MyCustomFrame3(wx.Frame,threading.Thread):
 		# if mutex.locked():
 			# print("ERROR!!")
@@ -268,7 +301,7 @@ class MyCustomFrame3(wx.Frame,threading.Thread):
 				self.Bind(wx.EVT_PAINT,self.OnPaint)
 				self.Bind(wx.EVT_CLOSE,self.closewindow)
 				font1 = wx.Font(24, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Consolas')
-				for k in range(60):
+				for k in range(2):
 					x=randint(0,8)
 					y=randint(0,8)
 					if mat_hard[x][y]!=' ':
@@ -321,17 +354,35 @@ class MyCustomFrame3(wx.Frame,threading.Thread):
 							aux.append(int(casute[a].GetValue().strip()))
 							a=a+1
 						list_verif.append(aux)
+					logging.info("Verify function was called")
 					print(list_verif,"\n")
-					#print(matrice)
-					if list_verif!=matrice_hard:
-						win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
-					else:
+					print(matrice_hard)
+					
+					v1=[]	
+					v2=[]
+					if list_verif==matrice_hard:
 						timp = time.time() - start_time
-						score=5000-int(timp)
+						score=3000-int(timp)
 						win32api.MessageBox(0,'Felicitations ! Vous avez fini le jeu avec le score: '+str(score)+' !','Fin du jeu')
-				except Exception as err:
-					win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')
-					logging.info("Completez seulement avec des chiffres entre 1 et 9")
+					else:
+						for n1 in range (9):
+							for n2 in range (9):
+								if not(list_verif[n1][n2]==matrice_hard[n1][n2]):
+									print(list_verif[n1][n2])
+									v1.append(n1)
+									v2.append(n2)
+									
+						print(v1)
+						print(v2)
+						indice=0						
+						for ceva in v1:
+							casute[ceva*9+v2[indice]].SetForegroundColour(wx.RED)
+							indice=indice+1
+						win32api.MessageBox(0,'Desole ! Il y a encore des chiffres mal mises !','Erreur')
+
+				except:
+					
+					win32api.MessageBox(0,'Completez seulement avec des chiffres entre 1 et 9!','Erreur')	
 def main(argv=None):
 	logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',filename='Sudoku.log', level=logging.INFO)
 	logging.info('Started')
